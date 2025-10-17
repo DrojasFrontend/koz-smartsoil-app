@@ -37,10 +37,10 @@ export default function Home() {
           {/* Layout de 2 columnas */}
           <div className="two-column-layout">
             <div className="main-column">
-              <ChartSection />
+              <ChartSection zoneData={currentZoneData} />
             </div>
             <div className="sidebar-column">
-              <ControlPanel />
+              <ControlPanel zoneData={currentZoneData} />
             </div>
           </div>
         </main>

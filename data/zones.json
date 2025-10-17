@@ -17,6 +17,22 @@
         "waterFlowText": "Sin riego",
         "savings": 45,
         "temperatureRange": "18-25°C"
+      },
+      "systemStatus": {
+        "sensorsActive": "4/4",
+        "valvesOperational": "2/4",
+        "pressure": "2.1 bar",
+        "connectivity": "Excelente"
+      },
+      "schedule": {
+        "lastIrrigation": "Hace 2 horas",
+        "nextIrrigation": "En 4 horas"
+      },
+      "chartData": {
+        "currentHumidity": "49.4%",
+        "currentTemperature": "24.2°C",
+        "irrigationStatus": "INACTIVO",
+        "humidityData": [60, 58, 55, 52, 45, 42, 40, 35, 33, 32, 35, 38, 42, 45, 50, 52, 55, 58, 60, 62, 60, 58, 55, 52, 42]
       }
     },
     {
@@ -36,6 +52,22 @@
         "waterFlowText": "Riego activo",
         "savings": 38,
         "temperatureRange": "18-25°C"
+      },
+      "systemStatus": {
+        "sensorsActive": "6/6",
+        "valvesOperational": "3/4",
+        "pressure": "1.8 bar",
+        "connectivity": "Excelente"
+      },
+      "schedule": {
+        "lastIrrigation": "Hace 6 horas",
+        "nextIrrigation": "Ahora"
+      },
+      "chartData": {
+        "currentHumidity": "41.3%",
+        "currentTemperature": "20.4°C",
+        "irrigationStatus": "INACTIVO",
+        "humidityData": [55, 54, 52, 50, 48, 45, 42, 40, 38, 35, 33, 30, 28, 30, 35, 40, 45, 50, 55, 58, 60, 62, 58, 55, 50]
       }
     },
     {
@@ -55,6 +87,22 @@
         "waterFlowText": "Riego activo",
         "savings": 52,
         "temperatureRange": "18-25°C"
+      },
+      "systemStatus": {
+        "sensorsActive": "8/8",
+        "valvesOperational": "4/4",
+        "pressure": "2.3 bar",
+        "connectivity": "Excelente"
+      },
+      "schedule": {
+        "lastIrrigation": "Ahora",
+        "nextIrrigation": "En 8 horas"
+      },
+      "chartData": {
+        "currentHumidity": "43.9%",
+        "currentTemperature": "22.7°C",
+        "irrigationStatus": "ACTIVO",
+        "humidityData": [50, 48, 45, 42, 40, 38, 35, 35, 38, 42, 48, 52, 58, 62, 65, 68, 70, 65, 60, 58, 55, 52, 48, 45, 42]
       }
     },
     {
@@ -74,6 +122,22 @@
         "waterFlowText": "Sin riego",
         "savings": 48,
         "temperatureRange": "18-25°C"
+      },
+      "systemStatus": {
+        "sensorsActive": "5/5",
+        "valvesOperational": "3/4",
+        "pressure": "2.0 bar",
+        "connectivity": "Excelente"
+      },
+      "schedule": {
+        "lastIrrigation": "Hace 3 horas",
+        "nextIrrigation": "En 5 horas"
+      },
+      "chartData": {
+        "currentHumidity": "51.2%",
+        "currentTemperature": "21.8°C",
+        "irrigationStatus": "INACTIVO",
+        "humidityData": [58, 57, 55, 54, 52, 50, 48, 45, 42, 40, 38, 40, 42, 45, 48, 52, 55, 58, 60, 62, 60, 58, 56, 54, 52]
       }
     }
   ]

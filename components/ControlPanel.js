@@ -1,4 +1,8 @@
-export default function ControlPanel() {
+export default function ControlPanel({ zoneData }) {
+  if (!zoneData) return null;
+
+  const { systemStatus } = zoneData;
+
   return (
     <div className="control-grid">
       {/* Control Manual */}
@@ -27,25 +31,25 @@ export default function ControlPanel() {
           <div className="status-item">
             <span className="status-label">Sensores</span>
             <span className="status-value success">
-              ✅ 4/4 Activos
+              ✅ {systemStatus.sensorsActive} Activos
             </span>
           </div>
           <div className="status-item">
             <span className="status-label">Válvulas</span>
             <span className="status-value success">
-              ✅ 2/4 Operativas
+              ✅ {systemStatus.valvesOperational} Operativas
             </span>
           </div>
           <div className="status-item">
             <span className="status-label">Presión</span>
             <span className="status-value">
-              2.1 bar
+              {systemStatus.pressure}
             </span>
           </div>
           <div className="status-item">
             <span className="status-label">Conectividad</span>
             <span className="status-value success">
-              📶 Excelente
+              📶 {systemStatus.connectivity}
             </span>
           </div>
         </div>

@@ -23,11 +23,13 @@ ChartJS.register(
   Filler
 );
 
-export default function ChartSection() {
+export default function ChartSection({ zoneData }) {
   const [activeMetric, setActiveMetric] = useState('humedad');
   const [activeTimeRange, setActiveTimeRange] = useState('24h');
 
-  // Datos simulados
+  if (!zoneData) return null;
+
+  // Datos dinámicos por zona
   const generateChartData = () => {
     const hours = [];
     const now = new Date();
@@ -39,11 +41,15 @@ export default function ChartSection() {
 
     let data = [];
     if (activeMetric === 'humedad') {
-      data = [60, 58, 55, 52, 45, 42, 40, 35, 33, 32, 35, 38, 42, 45, 50, 52, 55, 58, 60, 62, 60, 58, 55, 52, 42];
+      data = zoneData.chartData.humidityData;
     } else if (activeMetric === 'temperatura') {
       data = [18, 18, 17, 17, 16, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 24, 23, 22, 21, 20, 20, 19, 19, 18, 20];
     } else {
-      data = [0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      // Datos de riego basados en el estado
+      const isActive = zoneData.chartData.irrigationStatus === 'ACTIVO';
+      data = isActive 
+        ? [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0]
+        : [0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     }
 
     return {
@@ -91,7 +97,11 @@ export default function ChartSection() {
     }
   };
 
-  const currentValue = activeMetric === 'humedad' ? '41.7%' : activeMetric === 'temperatura' ? '19.7°C' : 'INACTIVO';
+  const currentValue = activeMetric === 'humedad' 
+    ? zoneData.chartData.currentHumidity 
+    : activeMetric === 'temperatura' 
+    ? zoneData.chartData.currentTemperature 
+    : zoneData.chartData.irrigationStatus;
 
   return (
     <>
@@ -123,7 +133,7 @@ export default function ChartSection() {
         </div>
 
         <div style={{ marginTop: '1.5rem' }}>
-          <h3 style={{ fontSize: '18px', marginBottom: '1rem' }}>Datos en Tiempo Real - Zona 1</h3>
+          <h3 style={{ fontSize: '18px', marginBottom: '1rem' }}>Datos en Tiempo Real - Zona {zoneData.id + 1}</h3>
           <div className="chart-tabs d-flex flex-lg-row flex-column gap-2 mb-4">
             <button
               className={`chart-tab ${activeMetric === 'humedad' ? 'active' : ''}`}
@@ -152,17 +162,25 @@ export default function ChartSection() {
 
         <div className="chart-stats">
           <div className="chart-stat">
-            <span className="chart-stat-value">{currentValue}</span>
+            <span className="chart-stat-value" style={{ 
+              color: activeMetric === 'riego' ? (zoneData.chartData.irrigationStatus === 'ACTIVO' ? '#059669' : '#6b7280') : '#1f2937' 
+            }}>
+              {currentValue}
+            </span>
             <span className="chart-stat-label">
               {activeMetric === 'humedad' ? 'Humedad Actual' : activeMetric === 'temperatura' ? 'Temperatura' : 'Estado Riego'}
             </span>
           </div>
           <div className="chart-stat">
-            <span className="chart-stat-value">19.7°C</span>
+            <span className="chart-stat-value">{zoneData.chartData.currentTemperature}</span>
             <span className="chart-stat-label">Temperatura</span>
           </div>
           <div className="chart-stat">
-            <span className="chart-stat-value" style={{ color: '#6b7280' }}>INACTIVO</span>
+            <span className="chart-stat-value" style={{ 
+              color: zoneData.chartData.irrigationStatus === 'ACTIVO' ? '#059669' : '#6b7280' 
+            }}>
+              {zoneData.chartData.irrigationStatus}
+            </span>
             <span className="chart-stat-label">Estado Riego</span>
           </div>
         </div>
@@ -177,11 +195,16 @@ export default function ChartSection() {
         <div className="schedule-info">
           <div className="schedule-item">
             <p>Último riego</p>
-            <p>Hace 2 horas</p>
+            <p>{zoneData.schedule.lastIrrigation}</p>
           </div>
           <div className="schedule-item">
             <p>Próximo riego</p>
-            <p>En 4 horas</p>
+            <p style={{ 
+              color: zoneData.schedule.nextIrrigation === 'Ahora' ? '#059669' : '#1f2937',
+              fontWeight: zoneData.schedule.nextIrrigation === 'Ahora' ? '700' : '600'
+            }}>
+              {zoneData.schedule.nextIrrigation}
+            </p>
           </div>
         </div>
       </div>
