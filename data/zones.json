@@ -1,0 +1,81 @@
+{
+  "zones": [
+    {
+      "id": 0,
+      "name": "Sector Norte - Paltos",
+      "area": "2.5 ha",
+      "sensors": "4 sensores",
+      "valves": "2 válvulas",
+      "icon": "✅",
+      "status": "Óptimo",
+      "statusColor": "#d1fae5",
+      "statusTextColor": "#059669",
+      "metrics": {
+        "humidity": 65,
+        "temperature": 22,
+        "waterFlow": 0,
+        "waterFlowText": "Sin riego",
+        "savings": 45,
+        "temperatureRange": "18-25°C"
+      }
+    },
+    {
+      "id": 1,
+      "name": "Sector Sur - Tomates",
+      "area": "1.8 ha",
+      "sensors": "6 sensores",
+      "valves": "3 válvulas",
+      "icon": "⚠️",
+      "status": "Necesita riego",
+      "statusColor": "#fed7aa",
+      "statusTextColor": "#ea580c",
+      "metrics": {
+        "humidity": 45,
+        "temperature": 28,
+        "waterFlow": 25.5,
+        "waterFlowText": "Riego activo",
+        "savings": 38,
+        "temperatureRange": "18-25°C"
+      }
+    },
+    {
+      "id": 2,
+      "name": "Invernadero A - Lechugas",
+      "area": "0.5 ha",
+      "sensors": "8 sensores",
+      "valves": "4 válvulas",
+      "icon": "💧",
+      "status": "Regando",
+      "statusColor": "#dbeafe",
+      "statusTextColor": "#3b82f6",
+      "metrics": {
+        "humidity": 72,
+        "temperature": 24,
+        "waterFlow": 18.2,
+        "waterFlowText": "Riego activo",
+        "savings": 52,
+        "temperatureRange": "18-25°C"
+      }
+    },
+    {
+      "id": 3,
+      "name": "Sector Este - Maíz",
+      "area": "3.2 ha",
+      "sensors": "5 sensores",
+      "valves": "3 válvulas",
+      "icon": "✅",
+      "status": "Óptimo",
+      "statusColor": "#d1fae5",
+      "statusTextColor": "#059669",
+      "metrics": {
+        "humidity": 58,
+        "temperature": 21,
+        "waterFlow": 0,
+        "waterFlowText": "Sin riego",
+        "savings": 48,
+        "temperatureRange": "18-25°C"
+      }
+    }
+  ]
+}
+
