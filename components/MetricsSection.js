@@ -2,6 +2,11 @@ export default function MetricsSection({ zoneData }) {
   if (!zoneData) return null;
 
   const { name, area, sensors, valves, status, statusColor, statusTextColor, metrics } = zoneData;
+  
+  // Manejar campos opcionales con valores por defecto
+  const sensorsText = sensors || `${zoneData.sensorsActive || 0}/${zoneData.sensorsTotal || 0} sensores`;
+  const valvesText = valves || 'N/A';
+  const savings = metrics?.savings || 0;
 
   return (
     <div className="metrics-section">
@@ -9,7 +14,7 @@ export default function MetricsSection({ zoneData }) {
         <div>
           <h3>{name}</h3>
           <p style={{ color: '#6b7280', fontSize: '14px', margin: 0 }}>
-            {area} • {sensors} • {valves}
+            {area} • {sensorsText} • {valvesText}
           </p>
         </div>
         <span 
@@ -82,8 +87,10 @@ export default function MetricsSection({ zoneData }) {
               <p>Este mes</p>
             </div>
           </div>
-          <div className="metric-value" style={{ color: '#9333ea' }}>{metrics.savings}%</div>
-          <div className="metric-info" style={{ color: '#9333ea' }}>vs. riego tradicional</div>
+          <div className="metric-value" style={{ color: '#9333ea' }}>{savings}%</div>
+          <div className="metric-info" style={{ color: '#9333ea' }}>
+            {savings === 0 ? 'Sin datos' : 'vs. riego tradicional'}
+          </div>
         </div>
       </div>
     </div>

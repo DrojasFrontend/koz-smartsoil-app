@@ -31,29 +31,69 @@ export default function ChartSection({ zoneData }) {
 
   // Datos dinámicos por zona
   const generateChartData = () => {
-    const hours = [];
-    const now = new Date();
-    
-    for (let i = 24; i >= 0; i--) {
-      const time = new Date(now.getTime() - i * 60 * 60 * 1000);
-      hours.push(time.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }));
-    }
-
     let data = [];
-    if (activeMetric === 'humedad') {
-      data = zoneData.chartData.humidityData;
-    } else if (activeMetric === 'temperatura') {
-      data = [18, 18, 17, 17, 16, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 24, 23, 22, 21, 20, 20, 19, 19, 18, 20];
-    } else {
-      // Datos de riego basados en el estado
-      const isActive = zoneData.chartData.irrigationStatus === 'ACTIVO';
-      data = isActive 
-        ? [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0]
-        : [0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    let labels = [];
+    
+    // Obtener datos según el rango de tiempo seleccionado
+    if (activeTimeRange === '24h') {
+      // Últimas 24 horas
+      if (activeMetric === 'humedad') {
+        data = zoneData.chartData?.humidityData || [];
+      } else if (activeMetric === 'temperatura') {
+        data = zoneData.chartData?.temperatureData || [];
+      } else {
+        // Datos de riego basados en el estado
+        const isActive = zoneData.chartData?.irrigationStatus === 'ACTIVO';
+        data = isActive 
+          ? Array(19).fill(0).concat(Array(6).fill(1))
+          : Array(6).fill(1).concat(Array(19).fill(0));
+      }
+      
+      // Generar labels de tiempo por hora
+      const now = new Date();
+      const dataLength = data.length;
+      for (let i = dataLength - 1; i >= 0; i--) {
+        const time = new Date(now.getTime() - i * 60 * 60 * 1000);
+        labels.push(time.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }));
+      }
+    } else if (activeTimeRange === '7d') {
+      // Últimos 7 días
+      if (activeMetric === 'humedad') {
+        data = zoneData.chartDataWeek?.humidityData || [];
+      } else if (activeMetric === 'temperatura') {
+        data = zoneData.chartDataWeek?.temperatureData || [];
+      } else {
+        data = Array(7).fill(0);
+      }
+      
+      // Labels por día
+      const now = new Date();
+      const dataLength = data.length;
+      for (let i = dataLength - 1; i >= 0; i--) {
+        const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+        labels.push(date.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric' }));
+      }
+    } else if (activeTimeRange === '30d') {
+      // Últimos 30 días
+      if (activeMetric === 'humedad') {
+        data = zoneData.chartDataMonth?.humidityData || [];
+      } else if (activeMetric === 'temperatura') {
+        data = zoneData.chartDataMonth?.temperatureData || [];
+      } else {
+        data = Array(30).fill(0);
+      }
+      
+      // Labels por día
+      const now = new Date();
+      const dataLength = data.length;
+      for (let i = dataLength - 1; i >= 0; i--) {
+        const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+        labels.push(date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }));
+      }
     }
 
     return {
-      labels: hours,
+      labels: labels,
       datasets: [
         {
           label: activeMetric === 'humedad' ? 'Humedad (%)' : activeMetric === 'temperatura' ? 'Temperatura (°C)' : 'Riego',
