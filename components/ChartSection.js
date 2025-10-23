@@ -48,7 +48,7 @@ export default function ChartSection({ zoneData, onDeviceSelect }) {
       } else if (activeMetric === 'temperatura') {
         data = selectedDeviceData.temperatureData30 || [];
       } else {
-        data = selectedDeviceData.irrigationData30 || [];
+        data = selectedDeviceData.conductivityData30 || [];
       }
       
       // Generar labels de tiempo por hora
@@ -101,9 +101,9 @@ export default function ChartSection({ zoneData, onDeviceSelect }) {
       datasets: activeMetric === 'humedad' ? [
         {
           label: 'Humedad 30cm',
-          data: selectedDeviceData.humidityData30 || [],
+          data: (selectedDeviceData.humidityData30 || []).map(value => value + 40),
           fill: false,
-          borderColor: '#3B82F6', // Azul
+          borderColor: '#3B82F6', // Azul - 30cm
           borderWidth: 3,
           tension: 0.4,
           pointRadius: 0,
@@ -111,9 +111,9 @@ export default function ChartSection({ zoneData, onDeviceSelect }) {
         },
         {
           label: 'Humedad 60cm',
-          data: selectedDeviceData.humidityData60 || [],
+          data: (selectedDeviceData.humidityData60 || []).map(value => value + 20),
           fill: false,
-          borderColor: '#3B82F6', // Azul
+          borderColor: '#EF4444', // Rojo - 60cm
           borderWidth: 3,
           tension: 0.4,
           pointRadius: 0,
@@ -123,7 +123,7 @@ export default function ChartSection({ zoneData, onDeviceSelect }) {
           label: 'Humedad 90cm',
           data: selectedDeviceData.humidityData90 || [],
           fill: false,
-          borderColor: '#3B82F6', // Azul
+          borderColor: '#10B981', // Verde - 90cm
           borderWidth: 3,
           tension: 0.4,
           pointRadius: 0,
@@ -132,9 +132,9 @@ export default function ChartSection({ zoneData, onDeviceSelect }) {
       ] : activeMetric === 'temperatura' ? [
         {
           label: 'Temperatura 30cm (°C)',
-          data: selectedDeviceData.temperatureData30 || [],
+          data: (selectedDeviceData.temperatureData30 || []).map(value => value + 40),
           fill: false,
-          borderColor: '#F97316', // Naranja
+          borderColor: '#3B82F6', // Azul - 30cm
           borderWidth: 3,
           tension: 0.4,
           pointRadius: 0,
@@ -142,9 +142,9 @@ export default function ChartSection({ zoneData, onDeviceSelect }) {
         },
         {
           label: 'Temperatura 60cm (°C)',
-          data: selectedDeviceData.temperatureData60 || [],
+          data: (selectedDeviceData.temperatureData60 || []).map(value => value + 20),
           fill: false,
-          borderColor: '#F97316', // Naranja
+          borderColor: '#EF4444', // Rojo - 60cm
           borderWidth: 3,
           tension: 0.4,
           pointRadius: 0,
@@ -154,7 +154,7 @@ export default function ChartSection({ zoneData, onDeviceSelect }) {
           label: 'Temperatura 90cm (°C)',
           data: selectedDeviceData.temperatureData90 || [],
           fill: false,
-          borderColor: '#F97316', // Naranja
+          borderColor: '#10B981', // Verde - 90cm
           borderWidth: 3,
           tension: 0.4,
           pointRadius: 0,
@@ -162,30 +162,30 @@ export default function ChartSection({ zoneData, onDeviceSelect }) {
         }
       ] : [
         {
-          label: 'Riego 30cm',
-          data: selectedDeviceData.irrigationData30 || [],
+          label: 'Conductividad 30cm',
+          data: (selectedDeviceData.conductivityData30 || []).map(value => value + 40),
           fill: false,
-          borderColor: '#10B981', // Verde
+          borderColor: '#3B82F6', // Azul - 30cm
           borderWidth: 3,
           tension: 0.4,
           pointRadius: 0,
           pointHoverRadius: 6
         },
         {
-          label: 'Riego 60cm',
-          data: selectedDeviceData.irrigationData60 || [],
+          label: 'Conductividad 60cm',
+          data: (selectedDeviceData.conductivityData60 || []).map(value => value + 20),
           fill: false,
-          borderColor: '#10B981', // Verde
+          borderColor: '#EF4444', // Rojo - 60cm
           borderWidth: 3,
           tension: 0.4,
           pointRadius: 0,
           pointHoverRadius: 6
         },
         {
-          label: 'Riego 90cm',
-          data: selectedDeviceData.irrigationData90 || [],
+          label: 'Conductividad 90cm',
+          data: selectedDeviceData.conductivityData90 || [],
           fill: false,
-          borderColor: '#10B981', // Verde
+          borderColor: '#10B981', // Verde - 90cm
           borderWidth: 3,
           tension: 0.4,
           pointRadius: 0,
@@ -210,6 +210,29 @@ export default function ChartSection({ zoneData, onDeviceSelect }) {
       tooltip: {
         mode: 'index',
         intersect: false,
+        callbacks: {
+          label: function(context) {
+            let label = context.dataset.label || '';
+            let value = context.parsed.y;
+            
+            // Ajustar los valores según el offset para todos los tipos
+            if (label.includes('30cm')) {
+              value = value - 40;
+            } else if (label.includes('60cm')) {
+              value = value - 20;
+            }
+
+            // Agregar las unidades correspondientes
+            if (activeMetric === 'humedad') {
+              return label + ': ' + value.toFixed(1) + '%';
+            } else if (activeMetric === 'temperatura') {
+              return label + ': ' + value.toFixed(1) + '°C';
+            } else if (activeMetric === 'conductividad') {
+              return label + ': ' + value.toFixed(1);
+            }
+            return label + ': ' + value;
+          }
+        }
       }
     },
     scales: {
@@ -217,6 +240,28 @@ export default function ChartSection({ zoneData, onDeviceSelect }) {
         beginAtZero: true,
         grid: {
           color: 'rgba(0, 0, 0, 0.05)'
+        },
+        ticks: {
+          stepSize: activeMetric === 'temperatura' ? 5 : 10,
+          callback: function(value) {
+            return activeMetric === 'temperatura' ? value + '°C' : value + '%';
+          }
+        },
+        min: 0,
+        max: activeMetric === 'temperatura' ? 80 : activeMetric === 'humedad' ? 140 : 140,
+        suggestedMin: 0,
+        suggestedMax: activeMetric === 'temperatura' ? 80 : activeMetric === 'humedad' ? 140 : 140,
+        ticks: {
+          stepSize: activeMetric === 'temperatura' ? 10 : 20,
+          callback: function(value) {
+            if (activeMetric === 'temperatura') {
+              return value + '°C';
+            } else if (activeMetric === 'humedad') {
+              return value + '%';
+            } else {
+              return value;
+            }
+          }
         }
       },
       x: {
@@ -236,7 +281,7 @@ export default function ChartSection({ zoneData, onDeviceSelect }) {
     } else if (activeMetric === 'temperatura') {
       return [selectedDeviceData.currentTemperature];
     } else {
-      return [selectedDeviceData.irrigationStatus];
+      return [selectedDeviceData.conductivityStatus];
     }
   };
 
@@ -313,10 +358,10 @@ export default function ChartSection({ zoneData, onDeviceSelect }) {
               Temperatura (°C)
             </button>
             <button
-              className={`chart-tab ${activeMetric === 'riego' ? 'active' : ''}`}
-              onClick={() => setActiveMetric('riego')}
+              className={`chart-tab ${activeMetric === 'conductividad' ? 'active' : ''}`}
+              onClick={() => setActiveMetric('conductividad')}
             >
-              Riego Activo
+              Conductividad
             </button>
           </div>
         </div>
@@ -349,7 +394,7 @@ export default function ChartSection({ zoneData, onDeviceSelect }) {
                 <div className="chart-stat" style={{ textAlign: 'center' }}>
                   <div style={{ marginBottom: '0.5rem' }}>
                     <span className="chart-stat-value" style={{ color: '#6b7280', fontSize: '1.2rem' }}>
-                      {selectedDeviceData.irrigationStatus}
+                      {selectedDeviceData.conductivityStatus}
                     </span>
                   </div>
                   <span className="chart-stat-label" style={{ color: '#6b7280' }}>Estado Riego</span>
