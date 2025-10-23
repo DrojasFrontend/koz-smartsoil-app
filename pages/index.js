@@ -8,10 +8,18 @@ import ChartSection from '../components/ChartSection';
 import ControlPanel from '../components/ControlPanel';
 import fallbackData from '../data/zones.json';
 
-const API_URL = 'https://n8n-fastmvp-u38739.vm.elestio.app/webhook/data';
+// Configuración de fuentes de datos
+// Para cambiar entre API y datos locales, comenta/descomenta las siguientes líneas:
+
+// Opción 1: Usar API externa
+// const API_URL = 'https://n8n-fastmvp-u38739.vm.elestio.app/webhook/data';
+
+// Opción 2: Usar datos locales (descomentar esta línea y comentar la de arriba)
+const API_URL = '/api/local-data';
 
 export default function Home() {
   const [activeZone, setActiveZone] = useState(0);
+  const [selectedDevice, setSelectedDevice] = useState(null);
   const [zonesData, setZonesData] = useState(fallbackData);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -90,12 +98,20 @@ export default function Home() {
           
           <CampoBanner zonesData={zonesData} />
           <ZoneTabs activeZone={activeZone} onZoneChange={handleZoneChange} zones={zonesData.zones} />
-          <MetricsSection zoneData={currentZoneData} />
-          
+          <MetricsSection 
+            zoneData={currentZoneData} 
+            selectedDevice={selectedDevice}
+          />
           {/* Layout de 2 columnas */}
           <div className="two-column-layout">
             <div className="main-column">
-              <ChartSection zoneData={currentZoneData} />
+              <ChartSection 
+                zoneData={currentZoneData}
+                onDeviceSelect={(deviceId) => {
+                  // Actualizar el dispositivo seleccionado en MetricsSection
+                  setSelectedDevice(deviceId);
+                }}
+              />
             </div>
             <div className="sidebar-column">
               <ControlPanel zoneData={currentZoneData} />

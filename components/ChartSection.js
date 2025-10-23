@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
+import Icon from './Icon';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -23,9 +24,10 @@ ChartJS.register(
   Filler
 );
 
-export default function ChartSection({ zoneData }) {
+export default function ChartSection({ zoneData, onDeviceSelect }) {
   const [activeMetric, setActiveMetric] = useState('humedad');
   const [activeTimeRange, setActiveTimeRange] = useState('24h');
+  const [selectedDevice, setSelectedDevice] = useState(zoneData?.chartData?.selectedDevice || 'sensor1');
 
   if (!zoneData) return null;
 
@@ -34,19 +36,19 @@ export default function ChartSection({ zoneData }) {
     let data = [];
     let labels = [];
     
+    // Obtener el dispositivo seleccionado
+    const selectedDeviceData = zoneData.chartData.devices.find(d => d.id === selectedDevice);
+    if (!selectedDeviceData) return { labels: [], datasets: [] };
+    
     // Obtener datos según el rango de tiempo seleccionado
     if (activeTimeRange === '24h') {
       // Últimas 24 horas
       if (activeMetric === 'humedad') {
-        data = zoneData.chartData?.humidityData || [];
+        data = selectedDeviceData.humidityData30 || [];
       } else if (activeMetric === 'temperatura') {
-        data = zoneData.chartData?.temperatureData || [];
+        data = selectedDeviceData.temperatureData30 || [];
       } else {
-        // Datos de riego basados en el estado
-        const isActive = zoneData.chartData?.irrigationStatus === 'ACTIVO';
-        data = isActive 
-          ? Array(19).fill(0).concat(Array(6).fill(1))
-          : Array(6).fill(1).concat(Array(19).fill(0));
+        data = selectedDeviceData.irrigationData30 || [];
       }
       
       // Generar labels de tiempo por hora
@@ -58,10 +60,11 @@ export default function ChartSection({ zoneData }) {
       }
     } else if (activeTimeRange === '7d') {
       // Últimos 7 días
+      const weekData = zoneData.chartDataWeek.devices.find(d => d.id === selectedDevice);
       if (activeMetric === 'humedad') {
-        data = zoneData.chartDataWeek?.humidityData || [];
+        data = weekData?.humidityData || [];
       } else if (activeMetric === 'temperatura') {
-        data = zoneData.chartDataWeek?.temperatureData || [];
+        data = weekData?.temperatureData || [];
       } else {
         data = Array(7).fill(0);
       }
@@ -75,10 +78,11 @@ export default function ChartSection({ zoneData }) {
       }
     } else if (activeTimeRange === '30d') {
       // Últimos 30 días
+      const monthData = zoneData.chartDataMonth.devices.find(d => d.id === selectedDevice);
       if (activeMetric === 'humedad') {
-        data = zoneData.chartDataMonth?.humidityData || [];
+        data = monthData?.humidityData || [];
       } else if (activeMetric === 'temperatura') {
-        data = zoneData.chartDataMonth?.temperatureData || [];
+        data = monthData?.temperatureData || [];
       } else {
         data = Array(30).fill(0);
       }
@@ -94,17 +98,98 @@ export default function ChartSection({ zoneData }) {
 
     return {
       labels: labels,
-      datasets: [
+      datasets: activeMetric === 'humedad' ? [
         {
-          label: activeMetric === 'humedad' ? 'Humedad (%)' : activeMetric === 'temperatura' ? 'Temperatura (°C)' : 'Riego',
-          data: data,
-          fill: true,
-          backgroundColor: 'rgba(59, 130, 246, 0.1)',
-          borderColor: 'rgba(59, 130, 246, 1)',
+          label: 'Humedad 30cm',
+          data: selectedDeviceData.humidityData30 || [],
+          fill: false,
+          borderColor: '#3B82F6', // Azul
           borderWidth: 3,
           tension: 0.4,
           pointRadius: 0,
           pointHoverRadius: 6,
+        },
+        {
+          label: 'Humedad 60cm',
+          data: selectedDeviceData.humidityData60 || [],
+          fill: false,
+          borderColor: '#3B82F6', // Azul
+          borderWidth: 3,
+          tension: 0.4,
+          pointRadius: 0,
+          pointHoverRadius: 6,
+        },
+        {
+          label: 'Humedad 90cm',
+          data: selectedDeviceData.humidityData90 || [],
+          fill: false,
+          borderColor: '#3B82F6', // Azul
+          borderWidth: 3,
+          tension: 0.4,
+          pointRadius: 0,
+          pointHoverRadius: 6,
+        }
+      ] : activeMetric === 'temperatura' ? [
+        {
+          label: 'Temperatura 30cm (°C)',
+          data: selectedDeviceData.temperatureData30 || [],
+          fill: false,
+          borderColor: '#F97316', // Naranja
+          borderWidth: 3,
+          tension: 0.4,
+          pointRadius: 0,
+          pointHoverRadius: 6,
+        },
+        {
+          label: 'Temperatura 60cm (°C)',
+          data: selectedDeviceData.temperatureData60 || [],
+          fill: false,
+          borderColor: '#F97316', // Naranja
+          borderWidth: 3,
+          tension: 0.4,
+          pointRadius: 0,
+          pointHoverRadius: 6,
+        },
+        {
+          label: 'Temperatura 90cm (°C)',
+          data: selectedDeviceData.temperatureData90 || [],
+          fill: false,
+          borderColor: '#F97316', // Naranja
+          borderWidth: 3,
+          tension: 0.4,
+          pointRadius: 0,
+          pointHoverRadius: 6,
+        }
+      ] : [
+        {
+          label: 'Riego 30cm',
+          data: selectedDeviceData.irrigationData30 || [],
+          fill: false,
+          borderColor: '#10B981', // Verde
+          borderWidth: 3,
+          tension: 0.4,
+          pointRadius: 0,
+          pointHoverRadius: 6
+        },
+        {
+          label: 'Riego 60cm',
+          data: selectedDeviceData.irrigationData60 || [],
+          fill: false,
+          borderColor: '#10B981', // Verde
+          borderWidth: 3,
+          tension: 0.4,
+          pointRadius: 0,
+          pointHoverRadius: 6
+        },
+        {
+          label: 'Riego 90cm',
+          data: selectedDeviceData.irrigationData90 || [],
+          fill: false,
+          borderColor: '#10B981', // Verde
+          borderWidth: 3,
+          tension: 0.4,
+          pointRadius: 0,
+          pointHoverRadius: 6
         }
       ]
     };
@@ -115,7 +200,12 @@ export default function ChartSection({ zoneData }) {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        display: false
+        display: true,
+        position: 'top',
+        labels: {
+          usePointStyle: true,
+          padding: 20
+        }
       },
       tooltip: {
         mode: 'index',
@@ -137,11 +227,20 @@ export default function ChartSection({ zoneData }) {
     }
   };
 
-  const currentValue = activeMetric === 'humedad' 
-    ? zoneData.chartData.currentHumidity 
-    : activeMetric === 'temperatura' 
-    ? zoneData.chartData.currentTemperature 
-    : zoneData.chartData.irrigationStatus;
+  const getCurrentValues = () => {
+    const selectedDeviceData = zoneData.chartData.devices.find(d => d.id === selectedDevice);
+    if (!selectedDeviceData) return ['N/A'];
+
+    if (activeMetric === 'humedad') {
+      return [selectedDeviceData.currentHumidity];
+    } else if (activeMetric === 'temperatura') {
+      return [selectedDeviceData.currentTemperature];
+    } else {
+      return [selectedDeviceData.irrigationStatus];
+    }
+  };
+
+  const currentValues = getCurrentValues();
 
   return (
     <>
@@ -149,25 +248,46 @@ export default function ChartSection({ zoneData }) {
         <div className="chart-header">
           <div>
             <h3>Datos Históricos</h3>
-            <div className="d-flex gap-2" style={{ marginTop: '0.5rem' }}>
-              <button
-                className={`chart-tab ${activeTimeRange === '24h' ? 'active' : ''}`}
-                onClick={() => setActiveTimeRange('24h')}
-              >
-                Últimas 24h
-              </button>
-              <button
-                className={`chart-tab ${activeTimeRange === '7d' ? 'active' : ''}`}
-                onClick={() => setActiveTimeRange('7d')}
-              >
-                7 días
-              </button>
-              <button
-                className={`chart-tab ${activeTimeRange === '30d' ? 'active' : ''}`}
-                onClick={() => setActiveTimeRange('30d')}
-              >
-                30 días
-              </button>
+            <div className="d-flex flex-column gap-2">
+              <div className="d-flex gap-2" style={{ marginTop: '0.5rem' }}>
+                {zoneData.chartData.devices.map(device => (
+                  <button
+                    key={device.id}
+                    className={`chart-tab ${selectedDevice === device.id ? 'active' : ''}`}
+                    onClick={() => {
+                      setSelectedDevice(device.id);
+                      onDeviceSelect?.(device.id);
+                    }}
+                    style={{
+                      backgroundColor: selectedDevice === device.id ? '#3B82F6' : 'transparent',
+                      color: selectedDevice === device.id ? 'white' : '#6b7280',
+                      border: `1px solid ${selectedDevice === device.id ? '#3B82F6' : '#e5e7eb'}`
+                    }}
+                  >
+                    {device.name}
+                  </button>
+                ))}
+              </div>
+              <div className="d-flex gap-2">
+                <button
+                  className={`chart-tab ${activeTimeRange === '24h' ? 'active' : ''}`}
+                  onClick={() => setActiveTimeRange('24h')}
+                >
+                  Últimas 24h
+                </button>
+                <button
+                  className={`chart-tab ${activeTimeRange === '7d' ? 'active' : ''}`}
+                  onClick={() => setActiveTimeRange('7d')}
+                >
+                  7 días
+                </button>
+                <button
+                  className={`chart-tab ${activeTimeRange === '30d' ? 'active' : ''}`}
+                  onClick={() => setActiveTimeRange('30d')}
+                >
+                  30 días
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -177,6 +297,11 @@ export default function ChartSection({ zoneData }) {
           <div className="chart-tabs d-flex flex-lg-row flex-column gap-2 mb-4">
             <button
               className={`chart-tab ${activeMetric === 'humedad' ? 'active' : ''}`}
+              style={{ 
+                backgroundColor: activeMetric === 'humedad' ? '#3B82F6' : 'transparent',
+                color: activeMetric === 'humedad' ? 'white' : '#6b7280',
+                border: `1px solid ${activeMetric === 'humedad' ? '#3B82F6' : '#e5e7eb'}`
+              }}
               onClick={() => setActiveMetric('humedad')}
             >
               Humedad del Suelo (%)
@@ -200,36 +325,45 @@ export default function ChartSection({ zoneData }) {
           <Line data={generateChartData()} options={options} />
         </div>
 
-        <div className="chart-stats">
-          <div className="chart-stat">
-            <span className="chart-stat-value" style={{ 
-              color: activeMetric === 'riego' ? (zoneData.chartData.irrigationStatus === 'ACTIVO' ? '#059669' : '#6b7280') : '#1f2937' 
-            }}>
-              {currentValue}
-            </span>
-            <span className="chart-stat-label">
-              {activeMetric === 'humedad' ? 'Humedad Actual' : activeMetric === 'temperatura' ? 'Temperatura' : 'Estado Riego'}
-            </span>
-          </div>
-          <div className="chart-stat">
-            <span className="chart-stat-value">{zoneData.chartData.currentTemperature}</span>
-            <span className="chart-stat-label">Temperatura</span>
-          </div>
-          <div className="chart-stat">
-            <span className="chart-stat-value" style={{ 
-              color: zoneData.chartData.irrigationStatus === 'ACTIVO' ? '#059669' : '#6b7280' 
-            }}>
-              {zoneData.chartData.irrigationStatus}
-            </span>
-            <span className="chart-stat-label">Estado Riego</span>
-          </div>
+        <div className="chart-stats" style={{ display: 'flex', justifyContent: 'space-between', padding: '1rem 2rem' }}>
+          {(() => {
+            const selectedDeviceData = zoneData.chartData.devices.find(d => d.id === selectedDevice);
+            return selectedDeviceData ? (
+              <>
+                <div className="chart-stat" style={{ textAlign: 'center' }}>
+                  <div style={{ marginBottom: '0.5rem' }}>
+                    <span className="chart-stat-value" style={{ color: '#6b7280', fontSize: '1.2rem' }}>
+                      {selectedDeviceData.currentHumidity}
+                    </span>
+                  </div>
+                  <span className="chart-stat-label" style={{ color: '#6b7280' }}>Humedad Actual</span>
+                </div>
+                <div className="chart-stat" style={{ textAlign: 'center' }}>
+                  <div style={{ marginBottom: '0.5rem' }}>
+                    <span className="chart-stat-value" style={{ color: '#6b7280', fontSize: '1.2rem' }}>
+                      {selectedDeviceData.currentTemperature}
+                    </span>
+                  </div>
+                  <span className="chart-stat-label" style={{ color: '#6b7280' }}>Temperatura</span>
+                </div>
+                <div className="chart-stat" style={{ textAlign: 'center' }}>
+                  <div style={{ marginBottom: '0.5rem' }}>
+                    <span className="chart-stat-value" style={{ color: '#6b7280', fontSize: '1.2rem' }}>
+                      {selectedDeviceData.irrigationStatus}
+                    </span>
+                  </div>
+                  <span className="chart-stat-label" style={{ color: '#6b7280' }}>Estado Riego</span>
+                </div>
+              </>
+            ) : null;
+          })()}
         </div>
       </div>
 
       {/* Programación de Riego */}
       <div className="schedule-card shadow-lg">
         <div className="schedule-header">
-          <span>📅</span>
+          <Icon name="calendar" />
           <h4>Programación de Riego</h4>
         </div>
         <div className="schedule-info">

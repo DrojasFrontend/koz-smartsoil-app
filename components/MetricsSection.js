@@ -1,7 +1,22 @@
-export default function MetricsSection({ zoneData }) {
+import Icon from './Icon';
+
+export default function MetricsSection({ zoneData, selectedDevice }) {
   if (!zoneData) return null;
 
-  const { name, area, sensors, valves, status, statusColor, statusTextColor, metrics } = zoneData;
+  const { name, area, sensors, valves, status, statusColor, statusTextColor, metrics, chartData } = zoneData;
+  
+  // Obtener datos del dispositivo seleccionado si existe
+  const deviceData = selectedDevice ? chartData.devices.find(d => d.id === selectedDevice) : null;
+  
+  // Usar datos del dispositivo si está seleccionado, o datos generales de la zona si no
+  const currentMetrics = deviceData ? {
+    humidity: parseFloat(deviceData.currentHumidity),
+    temperature: parseFloat(deviceData.currentTemperature),
+    waterFlow: metrics.waterFlow,
+    waterFlowText: metrics.waterFlowText,
+    temperatureRange: metrics.temperatureRange,
+    savings: metrics.savings
+  } : metrics;
   
   // Manejar campos opcionales con valores por defecto
   const sensorsText = sensors || `${zoneData.sensorsActive || 0}/${zoneData.sensorsTotal || 0} sensores`;
@@ -33,16 +48,16 @@ export default function MetricsSection({ zoneData }) {
         <div className="metric-card shadow-lg" style={{ backgroundColor: '#eff6ff' }}>
           <div className="metric-header">
             <div className="metric-icon blue">
-              💧
+              <Icon name="humidity" />
             </div>
             <div className="metric-title">
               <h4>Humedad</h4>
               <p>Suelo actual</p>
             </div>
           </div>
-          <div className="metric-value" style={{ color: '#3b82f6' }}>{metrics.humidity}%</div>
+          <div className="metric-value" style={{ color: '#3b82f6' }}>{currentMetrics.humidity}%</div>
           <div className="metric-progress">
-            <div className="metric-progress-bar" style={{ width: `${metrics.humidity}%` }}></div>
+            <div className="metric-progress-bar" style={{ width: `${currentMetrics.humidity}%` }}></div>
           </div>
         </div>
 
@@ -50,14 +65,14 @@ export default function MetricsSection({ zoneData }) {
         <div className="metric-card shadow-lg" style={{ backgroundColor: '#fff7ed' }}>
           <div className="metric-header">
             <div className="metric-icon orange">
-              🌡️
+              <Icon name="temperature" />
             </div>
             <div className="metric-title">
               <h4>Temperatura</h4>
               <p>Suelo actual</p>
             </div>
           </div>
-          <div className="metric-value" style={{ color: '#ea580c' }}>{metrics.temperature}°C</div>
+          <div className="metric-value" style={{ color: '#ea580c' }}>{currentMetrics.temperature}°C</div>
           <div className="metric-info" style={{ color: '#ea580c' }}>Rango óptimo: {metrics.temperatureRange}</div>
         </div>
 
@@ -65,7 +80,7 @@ export default function MetricsSection({ zoneData }) {
         <div className="metric-card shadow-lg" style={{ backgroundColor: '#f0fdf4' }}>
           <div className="metric-header">
             <div className="metric-icon green">
-              📊
+              <Icon name="water_flow" />
             </div>
             <div className="metric-title">
               <h4>Flujo de agua</h4>
@@ -80,7 +95,7 @@ export default function MetricsSection({ zoneData }) {
         <div className="metric-card shadow-lg" style={{ backgroundColor: '#faf5ff' }}>
           <div className="metric-header">
             <div className="metric-icon purple">
-              📈
+              <Icon name="savings" />
             </div>
             <div className="metric-title">
               <h4>Ahorro</h4>
